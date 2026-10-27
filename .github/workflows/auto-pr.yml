@@ -1,0 +1,41 @@
+name: Auto PR
+
+on:
+  push:
+    branches-ignore:
+      - main
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  auto-pr:
+    runs-on: ubuntu-latest
+    # No correr cuando el push es el borrado de una rama
+    if: github.event.deleted == false
+    steps:
+      - name: Crear PR hacia main si no existe uno abierto
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          BRANCH: ${{ github.ref_name }}
+          COMMIT_MSG: ${{ github.event.head_commit.message }}
+        run: |
+          # ¿Ya hay un PR abierto para esta rama?
+          existing=$(gh pr list --repo "$REPO" --head "$BRANCH" --state open --json number --jq 'length')
+          if [ "$existing" -gt 0 ]; then
+            echo "Ya existe un PR abierto para $BRANCH, no se crea otro."
+            exit 0
+          fi
+
+          # Título: primera línea del último commit (o el nombre de la rama si está vacío)
+          title=$(printf '%s\n' "$COMMIT_MSG" | head -n1)
+          [ -z "$title" ] && title="$BRANCH"
+
+          gh pr create \
+            --repo "$REPO" \
+            --base main \
+            --head "$BRANCH" \
+            --title "$title" \
+            --body "PR creado automáticamente al pushear la rama \`$BRANCH\`."
