@@ -6,4 +6,7 @@ public class Usuario {
     private String password;
     private String nombreCompleto;
     private String email;
+    private String comentario;
+
+    //kjwefnwefijwefwijefj
 }
