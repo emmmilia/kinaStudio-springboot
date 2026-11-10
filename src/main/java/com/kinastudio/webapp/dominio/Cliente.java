@@ -10,7 +10,13 @@ public class Cliente {
     private BigDecimal saldoAFavor;
     private String notas;
 
-    public Cliente(){
+    public Cliente(long id, String nombreCompleto, String email, String telefono, BigDecimal saldoAFavor, String notas){
+        this.id = id;
+        this.nombreCompleto = nombreCompleto;
+        this.email = email;
+        this.telefono = telefono;
+        this.saldoAFavor = saldoAFavor;
+        this.notas = notas;
 
     }
 }

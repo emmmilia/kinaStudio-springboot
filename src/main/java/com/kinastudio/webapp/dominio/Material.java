@@ -9,4 +9,14 @@ public class Material {
     private String marca;
     private String categoria;
     private int umbralMinimo;
+
+    public Material(long id, String nombre, int stock, BigDecimal precioUnitario, String marca, String categoria, int umbralMinimo){
+        this.id = id;
+        this.nombre = nombre;
+        this.stock = stock;
+        this.precioUnitario = precioUnitario;
+        this.marca = marca;
+        this.categoria = categoria;
+        this.umbralMinimo = umbralMinimo;
+    }
 }

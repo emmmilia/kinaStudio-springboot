@@ -6,7 +6,7 @@ import java.math.BigDecimal;
 public class Servicio {
     private long id;
     private String nombre;
-    private ArrayList<Esteticista> esteticistasHabilitadas;
+    private ArrayList<Usuario> esteticistasHabilitadas;
     private int tiempoEstimado;
     private Comision comision;
     private ArrayList<Material> materiales;

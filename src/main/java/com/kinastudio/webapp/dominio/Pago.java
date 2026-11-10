@@ -9,7 +9,11 @@ public class Pago {
     private LocalDateTime fechaPago;
     private String tipo; //senia o saldo
 
-    public Pago(){
-        
+    public Pago(long id, String metodoPago, BigDecimal monto, LocalDateTime fechaPago, String tipo){
+        this.id = id;
+        this.metodoPago = metodoPago;
+        this.monto = monto;
+        this.fechaPago = fechaPago;
+        this.tipo = tipo;
     }
 }

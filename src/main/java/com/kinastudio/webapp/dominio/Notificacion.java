@@ -7,4 +7,11 @@ public class Notificacion {
     private String mensaje;
     private String email;
     private LocalDateTime fechaHora;
+
+    public Notificacion(long id, String mensaje, String email, LocalDateTime fechaHora){
+        this.id = id;
+        this.mensaje = mensaje;
+        this.email = email;
+        this.fechaHora = fechaHora;
+    }
 }
