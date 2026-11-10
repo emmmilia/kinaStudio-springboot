@@ -7,7 +7,8 @@ public class Caja {
     private BigDecimal total;
     private List<Pago> pagos;
 
-    public Caja(){
-
+    public Caja(BigDecimal total, List<Pago> pagos){
+        this.total = total;
+        this.pagos = pagos;
     }
 }
