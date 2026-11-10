@@ -11,7 +11,7 @@ import java.util.regex.Pattern;
 public class SistemaAcceso {
     private ArrayList<Usuario> usuarios = new ArrayList<>();
     private final PasswordEncoder passwordEncoder;
-    private static final Pattern EMAIL = Pattern.compile("^[^@\\s]+@[^@\\s.]+(?:\\.[^@\\s.]+)+$");
+
 
     public SistemaAcceso(PasswordEncoder passwordEncoder){
         this.passwordEncoder = passwordEncoder;
@@ -21,7 +21,7 @@ public class SistemaAcceso {
         if (esVacio(nombreUsuario) || esVacio(password)) {
             throw new UsuarioException("Usuario y contraseña son obligatorios.");
         }
-        if (esVacio(email) || !EMAIL.matcher(email).matches()) {
+        if (!esMailValido(email)) {
             throw new UsuarioException("El mail no es válido.");
         }
         if (esVacio(nombreCompleto)) {
@@ -45,5 +45,18 @@ public class SistemaAcceso {
 
     private boolean esVacio(String texto) {
         return texto == null || texto.isBlank();
+    }
+
+    private boolean esMailValido(String email) {
+       if (esVacio(email) || email.chars().anyMatch(Character::isWhitespace)) {
+           return false;
+       }
+       int arroba = email.indexOf('@');
+       if (arroba <= 0 || arroba != email.lastIndexOf('@')) {
+           return false;
+       }
+       String dominio = email.substring(arroba + 1);
+       int punto = dominio.indexOf('.');
+       return punto > 0 && !dominio.endsWith(".") && !dominio.contains("..");
     }
 }

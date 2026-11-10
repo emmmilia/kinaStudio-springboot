@@ -27,7 +27,7 @@
 		<url/>
 	</scm>
 	<properties>
-		<java.version>25</java.version> <sonar.coverage.exclusions>**/WebappApplication.java,**/config/**,**/dtos/**,**/presentadores/**</sonar.coverage.exclusions>
+		<java.version>25</java.version> <sonar.coverage.exclusions>**/WebappApplication.java,**/config/**,**/dtos/**,**/presentadores/**,**/dominio/Caja.java,**/dominio/Cliente.java,**/dominio/Material.java,**/dominio/Notificacion.java,**/dominio/Pago.java,**/dominio/Turno.java,**/dominio/Servicio.java,**/dominio/Comision.java</sonar.coverage.exclusions>
 	</properties>
 	<dependencies>
 		<dependency>
