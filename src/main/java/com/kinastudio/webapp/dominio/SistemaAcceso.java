@@ -5,11 +5,13 @@ import java.util.ArrayList;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import com.kinastudio.webapp.dominio.excepciones.UsuarioException;
+import java.util.regex.Pattern;
 
 @Service 
 public class SistemaAcceso {
     private ArrayList<Usuario> usuarios = new ArrayList<>();
     private final PasswordEncoder passwordEncoder;
+    private static final Pattern EMAIL = Pattern.compile("^[^@\\s]+@[^@\\s.]+(?:\\.[^@\\s.]+)+$");
 
     public SistemaAcceso(PasswordEncoder passwordEncoder){
         this.passwordEncoder = passwordEncoder;
@@ -19,7 +21,7 @@ public class SistemaAcceso {
         if (esVacio(nombreUsuario) || esVacio(password)) {
             throw new UsuarioException("Usuario y contraseña son obligatorios.");
         }
-        if (esVacio(email) || !email.matches("^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$")) {
+        if (esVacio(email) || !EMAIL.matcher(email).matches()) {
             throw new UsuarioException("El mail no es válido.");
         }
         if (esVacio(nombreCompleto)) {
