@@ -1,6 +1,7 @@
 package com.kinastudio.webapp.dominio;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Optional;
 
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -80,6 +81,7 @@ public class SistemaAcceso {
     private boolean esVacio(String texto) {
         return texto == null || texto.isBlank();
     }
+
 
     private boolean esMailValido(String email) {
         if (esVacio(email) || email.chars().anyMatch(Character::isWhitespace)) {
