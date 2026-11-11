@@ -2,30 +2,35 @@ package com.kinastudio.webapp.dominio;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.transaction.annotation.Transactional;
 
-import com.kinastudio.webapp.dominio.SistemaAcceso;
-import com.kinastudio.webapp.dominio.TipoUsuario;
-import com.kinastudio.webapp.dominio.Usuario;
 import com.kinastudio.webapp.dominio.excepciones.UsuarioException;
+import com.kinastudio.webapp.dominio.repositorios.UsuarioRepository;
 
+// Se prueba contra la base H2 en memoria (src/test/resources/application.properties).
+// @Transactional deshace lo que cada test guarda, así los tests no se afectan entre sí.
+// Las dos propiedades vacías evitan que se cree el administrador inicial si la computadora
+// tiene definidas KINA_ADMIN_EMAIL y KINA_ADMIN_PASSWORD.
+@SpringBootTest(properties = { "KINA_ADMIN_EMAIL=", "KINA_ADMIN_PASSWORD=" })
+@Transactional
 class SistemaAccesoTest {
 
-    private PasswordEncoder encoder;
+    @Autowired
     private SistemaAcceso sistema;
 
-    @BeforeEach
-    void setUp() {
-        // Fuerza 4 (la mínima de BCrypt): hace que los tests corran rápido
-        encoder = new BCryptPasswordEncoder(4);
-        sistema = new SistemaAcceso(encoder);
-    }
+    @Autowired
+    private UsuarioRepository repositorio;
+
+    @Autowired
+    private PasswordEncoder encoder;
 
     // ---------- Altas válidas ----------
 
@@ -51,6 +56,7 @@ class SistemaAccesoTest {
         Usuario primero = sistema.crearUsuario("ana@mail.com", "ana", "clave123", "Ana Pérez", TipoUsuario.ESTETICISTA);
         Usuario segundo = sistema.crearUsuario("luz@mail.com", "luz", "clave123", "Luz Gómez", TipoUsuario.ESTETICISTA);
 
+        assertNotNull(primero.getId());
         assertNotEquals(primero.getId(), segundo.getId());
         assertTrue(segundo.getId() > primero.getId());
     }
@@ -61,6 +67,18 @@ class SistemaAccesoTest {
 
         assertNotEquals("clave123", u.getPasswordHash());
         assertTrue(encoder.matches("clave123", u.getPasswordHash()));
+    }
+
+    @Test
+    void elUsuarioQuedaGuardadoEnLaBase() throws UsuarioException {
+        Usuario creado = sistema.crearUsuario("ana@mail.com", "ana", "clave123", "Ana Pérez", TipoUsuario.ESTETICISTA);
+
+        Usuario leido = repositorio.findById(creado.getId()).orElseThrow();
+
+        assertEquals("ana@mail.com", leido.getEmail());
+        assertEquals("ana", leido.getNombreUsuario());
+        assertEquals(TipoUsuario.ESTETICISTA, leido.getRol());
+        assertEquals(1, repositorio.count());
     }
 
     // ---------- Duplicados ----------
@@ -135,13 +153,49 @@ class SistemaAccesoTest {
         assertEquals("El rol es obligatorio.", ex.getMessage());
     }
 
+    // ---------- Largos máximos (los de las columnas de la tabla) ----------
+
     @Test
-    void unAltaRechazadaNoDejaUsuarioGuardado() throws UsuarioException {
+    void rechazaMailDemasiadoLargo() {
+        String largo = "a".repeat(250) + "@mail.com";
+
+        UsuarioException ex = assertThrows(UsuarioException.class, () ->
+            sistema.crearUsuario(largo, "ana", "clave123", "Ana Pérez", TipoUsuario.ESTETICISTA));
+
+        assertEquals("El mail no puede superar los 254 caracteres.", ex.getMessage());
+    }
+
+    @Test
+    void rechazaNombreDeUsuarioDemasiadoLargo() {
+        UsuarioException ex = assertThrows(UsuarioException.class, () ->
+            sistema.crearUsuario("ana@mail.com", "a".repeat(51), "clave123", "Ana Pérez", TipoUsuario.ESTETICISTA));
+
+        assertEquals("El nombre de usuario no puede superar los 50 caracteres.", ex.getMessage());
+    }
+
+    @Test
+    void rechazaNombreCompletoDemasiadoLargo() {
+        UsuarioException ex = assertThrows(UsuarioException.class, () ->
+            sistema.crearUsuario("ana@mail.com", "ana", "clave123", "A".repeat(101), TipoUsuario.ESTETICISTA));
+
+        assertEquals("El nombre completo no puede superar los 100 caracteres.", ex.getMessage());
+    }
+
+    @Test
+    void rechazaPasswordDemasiadoLarga() {
+        UsuarioException ex = assertThrows(UsuarioException.class, () ->
+            sistema.crearUsuario("ana@mail.com", "ana", "x".repeat(73), "Ana Pérez", TipoUsuario.ESTETICISTA));
+
+        assertEquals("La contraseña es demasiado larga.", ex.getMessage());
+    }
+
+    // ---------- Un alta rechazada no deja nada guardado ----------
+
+    @Test
+    void unAltaRechazadaNoDejaUsuarioGuardado() {
         assertThrows(UsuarioException.class, () ->
             sistema.crearUsuario("no-es-un-mail", "ana", "clave123", "Ana Pérez", TipoUsuario.ESTETICISTA));
 
-        // Si el alta anterior hubiera guardado algo, esta fallaría por nombre de usuario repetido
-        Usuario u = sistema.crearUsuario("ana@mail.com", "ana", "clave123", "Ana Pérez", TipoUsuario.ESTETICISTA);
-        assertEquals("ana", u.getNombreUsuario());
+        assertEquals(0, repositorio.count());
     }
 }
