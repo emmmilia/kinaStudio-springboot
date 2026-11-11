@@ -30,7 +30,15 @@ public class PresentadorAcceso {
         return Commands.create(crearEsteticista(usuarioNuevo));
     }
 
+    @PostMapping("/login")
+    public Commands login(@RequestParam String nombreUsuario, @RequestParam String password, HttpSession session) throws UsuarioException {
+        Usuario usuario = fachada.login(nombreUsuario, password);
+        session.setAttribute(SistemaAcceso.ATRIBUTO_USUARIO, usuario);
+        return Commands.create(new Command("login", new UsuarioDto(usuario)));
+    }
+
     private Command crearEsteticista(Usuario usuario){
         return new Command("nuevoUsuario", new UsuarioDto(usuario));
     }
+    
 }
