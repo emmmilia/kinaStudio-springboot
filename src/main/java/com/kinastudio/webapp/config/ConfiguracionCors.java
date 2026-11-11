@@ -11,7 +11,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 /**
  * Permite que el front-end (otro origen, por ejemplo http://localhost:5173)
- * llame a esta API desde el navegador.
+ * llame a esta API desde el navegador, enviando la cookie de sesión.
  * Los orígenes permitidos se configuran con la propiedad kina.cors.origenes
  * (lista separada por comas). Por defecto: el servidor de desarrollo de Vite.
  */
@@ -24,7 +24,9 @@ public class ConfiguracionCors {
         CorsConfiguration configuracion = new CorsConfiguration();
         configuracion.setAllowedOrigins(origenes);
         configuracion.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        configuracion.setAllowedHeaders(List.of("*"));
+        configuracion.setAllowedHeaders(List.of("Content-Type", "X-CSRF-TOKEN"));
+        // Necesario para que el navegador envíe y reciba la cookie de sesión
+        configuracion.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource fuente = new UrlBasedCorsConfigurationSource();
         fuente.registerCorsConfiguration("/**", configuracion);
