@@ -1,9 +1,11 @@
 package com.kinastudio.webapp.config;
 
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
+import org.slf4j.Logger;
 
 import com.kinastudio.webapp.dominio.Fachada;
 import com.kinastudio.webapp.dominio.excepciones.UsuarioException;
@@ -23,6 +25,8 @@ public class AdministradorInicial implements ApplicationRunner {
     @Value("${KINA_ADMIN_PASSWORD:}")
     private String password;
 
+    private static final Logger log = LoggerFactory.getLogger(AdministradorInicial.class);
+
     public AdministradorInicial(Fachada fachada) {
         this.fachada = fachada;
     }
@@ -32,6 +36,11 @@ public class AdministradorInicial implements ApplicationRunner {
         if (email.isBlank() || password.isBlank()) {
             return;
         }
-        fachada.registrarAdministradorInicial(email, "admin", password, "Administrador");
+        try{
+          fachada.registrarAdministradorInicial(email, "admin", password, "Administrador");  
+        } catch (UsuarioException e){
+            log.warn("No se creó el administrador inicial: {}", e.getMessage());
+        }
+        
     }
 }
