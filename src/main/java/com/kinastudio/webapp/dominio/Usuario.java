@@ -80,4 +80,8 @@ public class Usuario {
     public TipoUsuario getRol() {
         return this.rol;
     }
+
+    public void setPassword(String passwordNueva){
+        this.passwordHash = passwordNueva;
+    }
 }

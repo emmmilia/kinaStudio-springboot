@@ -46,6 +46,12 @@ public class PresentadorSesion {
         return Map.of("nombreUsuario", authentication.getName(), "rol", rol);
     }
 
+    @PostMapping("/cambiarPassword")
+    public Commands modificarPassword(Authentication authentication, @RequestParam String passwordActual, @RequestParam String passwordNueva) throws UsuarioException{
+        fachada.cambiarPassword(authentication.getName(), passwordActual, passwordNueva);
+        return Commands.create(mensaje("Contraseña modificada con éxito."));
+    }
+
      @PostMapping("/registroEsteticista")
     public Commands registrarEsteticista(@RequestParam String email, @RequestParam String nombreUsuario, @RequestParam String password, @RequestParam String nombreCompleto) 
      throws UsuarioException {
@@ -55,5 +61,9 @@ public class PresentadorSesion {
 
     private Command crearEsteticista(Usuario usuario){
         return new Command("nuevoUsuario", new UsuarioDto(usuario));
+    }
+
+    private Command mensaje(String mensaje){
+        return new Command("idMensaje", mensaje);
     }
 }

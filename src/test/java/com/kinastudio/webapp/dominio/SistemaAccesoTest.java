@@ -1,6 +1,7 @@
 package com.kinastudio.webapp.dominio;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -73,8 +74,10 @@ class SistemaAccesoTest {
     void elUsuarioQuedaGuardadoEnLaBase() throws UsuarioException {
         Usuario creado = sistema.crearUsuario("ana@mail.com", "ana", "clave123", "Ana Pérez", TipoUsuario.ESTETICISTA);
 
-        Usuario leido = repositorio.findById(creado.getId()).orElseThrow();
+        Usuario leido = repositorio.findByNombreUsuarioIgnoreCase("ana");
 
+        assertNotNull(leido);
+        assertEquals(creado.getId(), leido.getId());
         assertEquals("ana@mail.com", leido.getEmail());
         assertEquals("ana", leido.getNombreUsuario());
         assertEquals(TipoUsuario.ESTETICISTA, leido.getRol());
@@ -197,5 +200,74 @@ class SistemaAccesoTest {
             sistema.crearUsuario("no-es-un-mail", "ana", "clave123", "Ana Pérez", TipoUsuario.ESTETICISTA));
 
         assertEquals(0, repositorio.count());
+    }
+
+    // ---------- Cambio de contraseña (RF.8) ----------
+
+    @Test
+    void cambiaLaPasswordCuandoLaActualEsCorrecta() throws UsuarioException {
+        sistema.crearUsuario("ana@mail.com", "ana", "clave123", "Ana Pérez", TipoUsuario.ESTETICISTA);
+
+        sistema.cambiarPassword("ana", "clave123", "otraClave456");
+
+        Usuario guardado = repositorio.findByNombreUsuarioIgnoreCase("ana");
+        assertTrue(encoder.matches("otraClave456", guardado.getPasswordHash()));
+        assertFalse(encoder.matches("clave123", guardado.getPasswordHash()));
+    }
+
+    @Test
+    void rechazaCambioConPasswordActualIncorrecta() throws UsuarioException {
+        sistema.crearUsuario("ana@mail.com", "ana", "clave123", "Ana Pérez", TipoUsuario.ESTETICISTA);
+
+        UsuarioException ex = assertThrows(UsuarioException.class, () ->
+            sistema.cambiarPassword("ana", "equivocada", "otraClave456"));
+
+        assertEquals("La contraseña actual es incorrecta.", ex.getMessage());
+        // La contraseña no cambió
+        Usuario guardado = repositorio.findByNombreUsuarioIgnoreCase("ana");
+        assertTrue(encoder.matches("clave123", guardado.getPasswordHash()));
+    }
+
+    @Test
+    void rechazaCambioSiLaNuevaEsIgualALaActual() throws UsuarioException {
+        sistema.crearUsuario("ana@mail.com", "ana", "clave123", "Ana Pérez", TipoUsuario.ESTETICISTA);
+
+        UsuarioException ex = assertThrows(UsuarioException.class, () ->
+            sistema.cambiarPassword("ana", "clave123", "clave123"));
+
+        assertEquals("La contraseña nueva debe ser distinta a la actual.", ex.getMessage());
+    }
+
+    @Test
+    void rechazaCambioConPasswordsVacias() throws UsuarioException {
+        sistema.crearUsuario("ana@mail.com", "ana", "clave123", "Ana Pérez", TipoUsuario.ESTETICISTA);
+
+        for (String vacia : new String[] { null, "", "   " }) {
+            UsuarioException sinActual = assertThrows(UsuarioException.class, () ->
+                sistema.cambiarPassword("ana", vacia, "otraClave456"));
+            assertEquals("Debe completar la contraseña actual y la nueva.", sinActual.getMessage());
+
+            UsuarioException sinNueva = assertThrows(UsuarioException.class, () ->
+                sistema.cambiarPassword("ana", "clave123", vacia));
+            assertEquals("Debe completar la contraseña actual y la nueva.", sinNueva.getMessage());
+        }
+    }
+
+    @Test
+    void rechazaCambioConPasswordNuevaDemasiadoLarga() throws UsuarioException {
+        sistema.crearUsuario("ana@mail.com", "ana", "clave123", "Ana Pérez", TipoUsuario.ESTETICISTA);
+
+        UsuarioException ex = assertThrows(UsuarioException.class, () ->
+            sistema.cambiarPassword("ana", "clave123", "x".repeat(73)));
+
+        assertEquals("La contraseña es demasiado larga.", ex.getMessage());
+    }
+
+    @Test
+    void rechazaCambioDeUnUsuarioInexistente() {
+        UsuarioException ex = assertThrows(UsuarioException.class, () ->
+            sistema.cambiarPassword("nadie", "clave123", "otraClave456"));
+
+        assertEquals("Usuario no encontrado.", ex.getMessage());
     }
 }

@@ -29,4 +29,8 @@ public class Fachada {
                                                  String nombreCompleto) throws UsuarioException {
         return sistemaAcceso.crearUsuario(email, nombreUsuario, password, nombreCompleto, TipoUsuario.ADMINISTRADOR);
     }
+
+    public void cambiarPassword(String nombreUsuario, String nuevaPassword, String passwordActual) throws UsuarioException{
+        sistemaAcceso.cambiarPassword(nombreUsuario, passwordActual, nuevaPassword);
+    }
 }
