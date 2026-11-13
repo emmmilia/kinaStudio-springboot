@@ -28,7 +28,7 @@ public class UsuarioDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(String nombreUsuario) throws UsernameNotFoundException {
         Usuario usuario = usuarioRepository.findByNombreUsuarioIgnoreCase(nombreUsuario);
         if(usuario == null){
-            new UsernameNotFoundException("Usuario o contraseña incorrectos.");
+            throw new UsernameNotFoundException("Usuario o contraseña incorrectos.");
         }
         //   .orElseThrow(() -> new UsernameNotFoundException("Usuario o contraseña incorrectos."));
 
