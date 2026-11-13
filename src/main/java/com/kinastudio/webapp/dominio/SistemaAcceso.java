@@ -60,6 +60,27 @@ public class SistemaAcceso {
         }
     }
 
+    public void cambiarPassword(String nombreUsuario, String passwordActual, String nuevaPassword) throws UsuarioException{
+        if(esVacio(nuevaPassword)||esVacio(passwordActual)){
+            throw new UsuarioException("Debe completar la contraseña actual y la nueva.");
+        }
+        if(nuevaPassword.getBytes(StandardCharsets.UTF_8).length > MAX_PASSWORD_BYTES){
+            throw new UsuarioException("La contraseña es demasiado larga.");
+        }
+        Usuario usuario = usuarioRepository.findByNombreUsuarioIgnoreCase(nombreUsuario);
+        if(usuario == null){
+            throw new UsuarioException("Usuario no encontrado.");
+        }
+        if (!passwordEncoder.matches(passwordActual, usuario.getPasswordHash())) {
+        throw new UsuarioException("La contraseña actual es incorrecta.");
+        }
+        if (passwordEncoder.matches(nuevaPassword, usuario.getPasswordHash())) {
+        throw new UsuarioException("La contraseña nueva debe ser distinta a la actual.");
+        }
+        usuario.setPassword(passwordEncoder.encode(nuevaPassword));
+        usuarioRepository.save(usuario);
+    }
+
     private void validarLargos(String email, String nombreUsuario, String password, String nombreCompleto)
             throws UsuarioException {
         if (email.length() > MAX_EMAIL) {
@@ -77,6 +98,7 @@ public class SistemaAcceso {
             throw new UsuarioException("La contraseña es demasiado larga.");
         }
     }
+
 
     private boolean esVacio(String texto) {
         return texto == null || texto.isBlank();
