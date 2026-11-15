@@ -73,6 +73,14 @@ public class Usuario {
         return this.comentario;
     }
 
+    public String setEmail(String email){
+        return this.email = email;
+    }
+
+    public void setNombreCompleto(String nombreCompleto){
+        this.nombreCompleto = nombreCompleto;
+    }
+
     public void setComentario(String comentario) {
         this.comentario = comentario;
     }

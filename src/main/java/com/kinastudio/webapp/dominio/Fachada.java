@@ -1,6 +1,7 @@
 package com.kinastudio.webapp.dominio;
 
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import com.kinastudio.webapp.dominio.excepciones.UsuarioException;
 
@@ -20,6 +21,10 @@ public class Fachada {
         this.sistemaPago = sistemaPago;
     }
 
+    public Usuario modificarUsuario(String nombreUsuario, String email, String nombreCompleto, String comentario) throws UsuarioException{
+        return sistemaAcceso.modificarUsuario(nombreUsuario, email, nombreCompleto, comentario);
+    }
+
     public Usuario registrarEsteticista(String email, String nombreUsuario, String password,
                                         String nombreCompleto) throws UsuarioException {
         return sistemaAcceso.crearUsuario(email, nombreUsuario, password, nombreCompleto, TipoUsuario.ESTETICISTA);
@@ -30,7 +35,7 @@ public class Fachada {
         return sistemaAcceso.crearUsuario(email, nombreUsuario, password, nombreCompleto, TipoUsuario.ADMINISTRADOR);
     }
 
-    public void cambiarPassword(String nombreUsuario, String nuevaPassword, String passwordActual) throws UsuarioException{
+    public void cambiarPassword(String nombreUsuario, String passwordActual, String nuevaPassword) throws UsuarioException{
         sistemaAcceso.cambiarPassword(nombreUsuario, passwordActual, nuevaPassword);
     }
 }
