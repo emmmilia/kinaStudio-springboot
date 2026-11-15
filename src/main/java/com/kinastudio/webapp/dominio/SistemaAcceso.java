@@ -124,8 +124,6 @@ public class SistemaAcceso {
     }
 
 
-
-
     private boolean esVacio(String texto) {
         return texto == null || texto.isBlank();
     }
