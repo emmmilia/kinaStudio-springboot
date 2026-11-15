@@ -62,6 +62,9 @@ public class SistemaAcceso {
 
     public Usuario modificarUsuario(String nombreUsuario, String email, String nombreCompleto, String comentario) throws UsuarioException{
         Usuario usuario = usuarioRepository.findByNombreUsuarioIgnoreCase(nombreUsuario);
+        if (usuario == null) {
+            throw new UsuarioException("Usuario no encontrado.");
+        }
         if(!esMailValido(email)){
             throw new UsuarioException("El mail no es válido.");
         }
@@ -69,10 +72,10 @@ public class SistemaAcceso {
             throw new UsuarioException("El nombre es obligatorio");
         }
          if (email.length() > MAX_EMAIL || nombreCompleto.length() > MAX_NOMBRE_COMPLETO){
-        throw new UsuarioException("Algún dato supera el largo permitido.");
+            throw new UsuarioException("Algún dato supera el largo permitido.");
         }
         if (usuarioRepository.existsByEmailIgnoreCaseAndIdNot(email, usuario.getId())){
-        throw new UsuarioException("Ese mail ya está registrado.");
+            throw new UsuarioException("Ese mail ya está registrado.");
         }
         usuario.setEmail(email);
         usuario.setNombreCompleto(nombreCompleto);
@@ -96,10 +99,10 @@ public class SistemaAcceso {
             throw new UsuarioException("Usuario no encontrado.");
         }
         if (!passwordEncoder.matches(passwordActual, usuario.getPasswordHash())) {
-        throw new UsuarioException("La contraseña actual es incorrecta.");
+            throw new UsuarioException("La contraseña actual es incorrecta.");
         }
         if (passwordEncoder.matches(nuevaPassword, usuario.getPasswordHash())) {
-        throw new UsuarioException("La contraseña nueva debe ser distinta a la actual.");
+            throw new UsuarioException("La contraseña nueva debe ser distinta a la actual.");
         }
         usuario.setPassword(passwordEncoder.encode(nuevaPassword));
         usuarioRepository.save(usuario);

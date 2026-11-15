@@ -1,11 +1,7 @@
 package com.kinastudio.webapp.dominio;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
+import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -269,5 +265,66 @@ class SistemaAccesoTest {
             sistema.cambiarPassword("nadie", "clave123", "otraClave456"));
 
         assertEquals("Usuario no encontrado.", ex.getMessage());
+    }
+
+        // Nombres y mails únicos para que los tests no choquen con datos de otras ejecuciones
+    private Usuario crearUsuarioDePrueba() throws UsuarioException {
+        String sufijo = UUID.randomUUID().toString().substring(0, 8);
+        return sistema.crearUsuario(sufijo + "@mail.com", "user" + sufijo, "Clave123",
+                "Usuario Prueba", TipoUsuario.ESTETICISTA);
+    }
+
+    @Test
+    void modificarUsuarioGuardaLosDatosNuevos() throws UsuarioException {
+        Usuario u = crearUsuarioDePrueba();
+        String mailNuevo = "nuevo" + u.getEmail();
+
+        Usuario modificado = sistema.modificarUsuario(u.getNombreUsuario(), mailNuevo, "Nombre Nuevo", "comentario");
+
+        assertEquals(mailNuevo, modificado.getEmail());
+        assertEquals("Nombre Nuevo", modificado.getNombreCompleto());
+        assertEquals("comentario", modificado.getComentario());
+    }
+
+    @Test
+    void modificarUsuarioPermiteDejarElMismoMail() throws UsuarioException {
+        Usuario u = crearUsuarioDePrueba();
+        assertDoesNotThrow(() ->
+            sistema.modificarUsuario(u.getNombreUsuario(), u.getEmail(), "Otro Nombre", null));
+    }
+
+    @Test
+    void modificarUsuarioFallaSiNoExiste() {
+        assertThrows(UsuarioException.class, () ->
+            sistema.modificarUsuario("noexiste" + UUID.randomUUID(), "a@mail.com", "Nombre", null));
+    }
+
+    @Test
+    void modificarUsuarioFallaConMailInvalido() throws UsuarioException {
+        Usuario u = crearUsuarioDePrueba();
+        assertThrows(UsuarioException.class, () ->
+            sistema.modificarUsuario(u.getNombreUsuario(), "mailmalo", "Nombre", null));
+    }
+
+    @Test
+    void modificarUsuarioFallaConNombreVacio() throws UsuarioException {
+        Usuario u = crearUsuarioDePrueba();
+        assertThrows(UsuarioException.class, () ->
+            sistema.modificarUsuario(u.getNombreUsuario(), u.getEmail(), "  ", null));
+    }
+
+    @Test
+    void modificarUsuarioFallaSiElNombreEsMuyLargo() throws UsuarioException {
+        Usuario u = crearUsuarioDePrueba();
+        assertThrows(UsuarioException.class, () ->
+            sistema.modificarUsuario(u.getNombreUsuario(), u.getEmail(), "a".repeat(101), null));
+    }
+
+    @Test
+    void modificarUsuarioFallaSiElMailLoUsaOtro() throws UsuarioException {
+        Usuario primero = crearUsuarioDePrueba();
+        Usuario segundo = crearUsuarioDePrueba();
+        assertThrows(UsuarioException.class, () ->
+            sistema.modificarUsuario(segundo.getNombreUsuario(), primero.getEmail(), "Nombre", null));
     }
 }
