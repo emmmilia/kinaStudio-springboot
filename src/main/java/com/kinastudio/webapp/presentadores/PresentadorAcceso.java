@@ -50,6 +50,11 @@ public class PresentadorAcceso {
         return Map.of("nombreUsuario", authentication.getName(), "rol", rol);
     }
 
+     @GetMapping("/perfil")
+    public UsuarioDto perfil(Authentication auth) throws UsuarioException {
+        return new UsuarioDto(fachada.obtenerUsuario(auth.getName()));
+    }
+
     @PostMapping("/perfil")
     public Commands modificarPerfil(Authentication auth, @RequestParam String email, @RequestParam String nombreCompleto, @RequestParam(required = false) String comentario) throws UsuarioException{
         Usuario usuario = fachada.modificarUsuario(auth.getName(), email, nombreCompleto, comentario);

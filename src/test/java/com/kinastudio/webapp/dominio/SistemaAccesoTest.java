@@ -327,4 +327,15 @@ class SistemaAccesoTest {
         assertThrows(UsuarioException.class, () ->
             sistema.modificarUsuario(segundo.getNombreUsuario(), primero.getEmail(), "Nombre", null));
     }
+
+    @Test
+    void obtenerUsuarioDevuelveElUsuario() throws UsuarioException {
+        Usuario u = crearUsuarioDePrueba();
+        assertEquals(u.getEmail(), sistema.obtenerUsuario(u.getNombreUsuario()).getEmail());
+    }
+
+    @Test
+    void obtenerUsuarioFallaSiNoExiste() {
+        assertThrows(UsuarioException.class, () -> sistema.obtenerUsuario("noexiste" + UUID.randomUUID()));
+    }
 }

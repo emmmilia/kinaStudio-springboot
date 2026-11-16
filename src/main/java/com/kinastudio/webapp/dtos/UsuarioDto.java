@@ -18,6 +18,7 @@ public class UsuarioDto {
         this.nombreUsuario = usuario.getNombreUsuario();
         this.nombreCompleto = usuario.getNombreCompleto();
         this.rol = usuario.getRol();
+        this.comentario = usuario.getComentario();
     }
 
     public String getEmail() {
@@ -26,6 +27,14 @@ public class UsuarioDto {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getComentario(){
+        return comentario;
+    }
+
+    public void setComentario(String comentario){
+        this.comentario = comentario;
     }
 
     public String getNombreUsuario() {

@@ -87,6 +87,14 @@ public class SistemaAcceso {
         }
     }
 
+    public Usuario obtenerUsuario(String nombreUsuario) throws UsuarioException {
+        Usuario usuario = usuarioRepository.findByNombreUsuarioIgnoreCase(nombreUsuario);
+        if (usuario == null) {
+            throw new UsuarioException("Usuario no encontrado.");
+        }
+        return usuario;
+    }
+
     public void cambiarPassword(String nombreUsuario, String passwordActual, String nuevaPassword) throws UsuarioException{
         if(esVacio(nuevaPassword)||esVacio(passwordActual)){
             throw new UsuarioException("Debe completar la contraseña actual y la nueva.");

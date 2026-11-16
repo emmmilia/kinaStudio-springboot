@@ -25,6 +25,10 @@ public class Fachada {
         return sistemaAcceso.modificarUsuario(nombreUsuario, email, nombreCompleto, comentario);
     }
 
+    public Usuario obtenerUsuario(String nombreUsuario) throws UsuarioException {
+        return sistemaAcceso.obtenerUsuario(nombreUsuario);
+    }
+
     public Usuario registrarEsteticista(String email, String nombreUsuario, String password,
                                         String nombreCompleto) throws UsuarioException {
         return sistemaAcceso.crearUsuario(email, nombreUsuario, password, nombreCompleto, TipoUsuario.ESTETICISTA);
