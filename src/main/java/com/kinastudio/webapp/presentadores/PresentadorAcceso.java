@@ -5,6 +5,7 @@ import java.util.Map;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.web.csrf.CsrfToken;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,16 +17,19 @@ import com.kinastudio.webapp.dominio.Usuario;
 import com.kinastudio.webapp.dominio.excepciones.UsuarioException;
 import com.kinastudio.webapp.dtos.UsuarioDto;
 
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+
 /**
  * Endpoints de apoyo al login. No tocan el dominio: la sesión la maneja Spring Security.
  */
 @RestController
 @RequestMapping("/acceso")
-public class PresentadorSesion {
+public class PresentadorAcceso {
 
     private Fachada fachada;
 
-    public PresentadorSesion(Fachada fachada){
+    public PresentadorAcceso(Fachada fachada){
         this.fachada = fachada;
     }
 
@@ -46,6 +50,17 @@ public class PresentadorSesion {
         return Map.of("nombreUsuario", authentication.getName(), "rol", rol);
     }
 
+     @GetMapping("/perfil")
+    public UsuarioDto perfil(Authentication auth) throws UsuarioException {
+        return new UsuarioDto(fachada.obtenerUsuario(auth.getName()));
+    }
+
+    @PostMapping("/perfil")
+    public Commands modificarPerfil(Authentication auth, @RequestParam String email, @RequestParam String nombreCompleto, @RequestParam(required = false) String comentario) throws UsuarioException{
+        Usuario usuario = fachada.modificarUsuario(auth.getName(), email, nombreCompleto, comentario);
+        return Commands.create(new Command("usuario modificado.", new UsuarioDto(usuario)));
+    }
+ 
     @PostMapping("/cambiarPassword")
     public Commands modificarPassword(Authentication authentication, @RequestParam String passwordActual, @RequestParam String passwordNueva) throws UsuarioException{
         fachada.cambiarPassword(authentication.getName(), passwordActual, passwordNueva);
