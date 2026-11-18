@@ -42,4 +42,12 @@ public class Fachada {
     public void cambiarPassword(String nombreUsuario, String nuevaPassword, String passwordActual) throws UsuarioException{
         sistemaAcceso.cambiarPassword(nombreUsuario, passwordActual, nuevaPassword);
     }
+
+    public void solicitarRecuperacionPassword(String email) throws UsuarioException{
+        sistemaAcceso.solicitarRecuperacionPassword(email);
+    }
+
+    public void restablecerPassword(String token, String password) throws UsuarioException{
+        sistemaAcceso.restablecerPassword(token, password);
+    }
 }

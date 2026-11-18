@@ -338,4 +338,6 @@ class SistemaAccesoTest {
     void obtenerUsuarioFallaSiNoExiste() {
         assertThrows(UsuarioException.class, () -> sistema.obtenerUsuario("noexiste" + UUID.randomUUID()));
     }
+
+    
 }
