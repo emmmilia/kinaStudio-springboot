@@ -1,13 +1,20 @@
 package com.kinastudio.webapp.dominio;
 
 import java.nio.charset.StandardCharsets;
-import java.util.Optional;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.time.LocalDateTime;
+import java.util.Base64;
+import java.util.HexFormat;
 
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.kinastudio.webapp.dominio.excepciones.UsuarioException;
+import com.kinastudio.webapp.dominio.repositorios.TokenRecuperacionRepository;
 import com.kinastudio.webapp.dominio.repositorios.UsuarioRepository;
 
 @Service
@@ -19,13 +26,23 @@ public class SistemaAcceso {
     private static final int MAX_NOMBRE_COMPLETO = 100;
     //BCrypt solo usa los primeros 72 bytes de la contraseña
     private static final int MAX_PASSWORD_BYTES = 72;
+    //Recuperación de contraseña
+    private static final int MINUTOS_VIGENCIA_TOKEN = 30;
+    private static final int BYTES_TOKEN = 32;
+    private static final String ENLACE_INVALIDO = "El enlace no es válido o expiró.";
+    private static final SecureRandom RANDOM = new SecureRandom();
 
     private final UsuarioRepository usuarioRepository;
+    private final TokenRecuperacionRepository tokenRepository;
     private final PasswordEncoder passwordEncoder;
+    private final ServicioEmail servicioEmail;
 
-    public SistemaAcceso(UsuarioRepository usuarioRepository, PasswordEncoder passwordEncoder) {
+    public SistemaAcceso(UsuarioRepository usuarioRepository, TokenRecuperacionRepository tokenRepository,
+            PasswordEncoder passwordEncoder, ServicioEmail servicioEmail) {
         this.usuarioRepository = usuarioRepository;
+        this.tokenRepository = tokenRepository;
         this.passwordEncoder = passwordEncoder;
+        this.servicioEmail = servicioEmail;
     }
 
     public Usuario crearUsuario(String email, String nombreUsuario, String password, String nombreCompleto,
@@ -114,6 +131,72 @@ public class SistemaAcceso {
         }
         usuario.setPassword(passwordEncoder.encode(nuevaPassword));
         usuarioRepository.save(usuario);
+    }
+
+    /**
+     * Paso 1 de la recuperación: si el mail pertenece a un usuario, le manda un enlace con un token.
+     * Si no existe NO falla ni avisa: así nadie puede averiguar qué mails están registrados.
+     */
+    public void solicitarRecuperacionPassword(String email) throws UsuarioException {
+        if (esVacio(email)) {
+            throw new UsuarioException("Debe ingresar el mail.");
+        }
+        Usuario usuario = usuarioRepository.findByEmailIgnoreCase(email.trim());
+        if (usuario == null) {
+            return;
+        }
+        // Solo vale el último enlace pedido
+        invalidarTokensPendientes(usuario);
+
+        String token = generarToken();
+        tokenRepository.save(new TokenRecuperacion(usuario, hashear(token),
+                LocalDateTime.now().plusMinutes(MINUTOS_VIGENCIA_TOKEN)));
+        servicioEmail.enviarRecuperacion(usuario.getEmail(), usuario.getNombreCompleto(), token);
+    }
+
+    /** Paso 2 de la recuperación: con el token del mail se elige la contraseña nueva. */
+    @Transactional
+    public void restablecerPassword(String token, String passwordNueva) throws UsuarioException {
+        if (esVacio(passwordNueva)) {
+            throw new UsuarioException("Debe completar la contraseña nueva.");
+        }
+        if (passwordNueva.getBytes(StandardCharsets.UTF_8).length > MAX_PASSWORD_BYTES) {
+            throw new UsuarioException("La contraseña es demasiado larga.");
+        }
+        if (esVacio(token)) {
+            throw new UsuarioException(ENLACE_INVALIDO);
+        }
+        TokenRecuperacion registro = tokenRepository.findByTokenHash(hashear(token));
+        if (registro == null || !registro.estaVigente(LocalDateTime.now())) {
+            throw new UsuarioException(ENLACE_INVALIDO);
+        }
+        Usuario usuario = registro.getUsuario();
+        usuario.setPassword(passwordEncoder.encode(passwordNueva));
+        usuarioRepository.save(usuario);
+        // Marca este y cualquier otro enlace pendiente como usado
+        invalidarTokensPendientes(usuario);
+    }
+
+    private void invalidarTokensPendientes(Usuario usuario) {
+        var pendientes = tokenRepository.findByUsuarioAndUsadoFalse(usuario);
+        pendientes.forEach(TokenRecuperacion::marcarUsado);
+        tokenRepository.saveAll(pendientes);
+    }
+
+    private String generarToken() {
+        byte[] bytes = new byte[BYTES_TOKEN];
+        RANDOM.nextBytes(bytes);
+        return Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
+    }
+
+    private String hashear(String token) {
+        try {
+            byte[] hash = MessageDigest.getInstance("SHA-256").digest(token.getBytes(StandardCharsets.UTF_8));
+            return HexFormat.of().formatHex(hash);
+        } catch (NoSuchAlgorithmException e) {
+            // SHA-256 es obligatorio en toda JVM; no puede pasar
+            throw new IllegalStateException("SHA-256 no disponible", e);
+        }
     }
 
     private void validarLargos(String email, String nombreUsuario, String password, String nombreCompleto)

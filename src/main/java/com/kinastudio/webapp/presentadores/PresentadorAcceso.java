@@ -67,6 +67,17 @@ public class PresentadorAcceso {
         return Commands.create(mensaje("Contraseña modificada con éxito."));
     }
 
+    @PostMapping("/recuperarPassword")
+    public Commands recuperarPassword(@RequestParam String email) throws UsuarioException{
+        fachada.solicitarRecuperacionPassword(email);
+        return Commands.create(mensaje("Si el mail está registrado, te enviamos un enlace para restablecer tu contraseña."));
+    }
+
+    @PostMapping("/restablecerPassword")
+    public Commands restablecerPassword(@RequestParam String token, @RequestParam String passwordNueva) throws UsuarioException{
+        fachada.restablecerPassword(token, passwordNueva);
+        return Commands.create(mensaje("Contraseña restablecida con éxito."));
+    }
      @PostMapping("/registroEsteticista")
     public Commands registrarEsteticista(@RequestParam String email, @RequestParam String nombreUsuario, @RequestParam String password, @RequestParam String nombreCompleto) 
      throws UsuarioException {

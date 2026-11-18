@@ -28,7 +28,7 @@ public class SecurityConfig {
         http
             .cors(Customizer.withDefaults())
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/error", "/acceso/csrf").permitAll()
+                .requestMatchers("/error", "/acceso/csrf", "/acceso/recuperarPassword", "/acceso/restablecerPassword").permitAll()
                 .requestMatchers("/acceso/registroEsteticista").hasRole("ADMINISTRADOR")
                 .anyRequest().authenticated())
             .formLogin(form -> form
