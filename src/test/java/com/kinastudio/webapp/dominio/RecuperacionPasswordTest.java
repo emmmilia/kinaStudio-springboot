@@ -198,4 +198,24 @@ class RecuperacionPasswordTest {
         UsuarioException e = assertThrows(UsuarioException.class, () -> sistema.restablecerPassword(null, "nueva456"));
         assertEquals(ENLACE_INVALIDO, e.getMessage());
     }
+
+    // ---------- Datos del token guardado ----------
+
+    @Test
+    void elTokenGuardadoVenceEn30MinutosYNoEstaUsado() throws UsuarioException {
+        crearAna();
+        pedirToken();
+        TokenRecuperacion registro = tokens.findAll().get(0);
+        assertFalse(registro.isUsado());
+        assertTrue(registro.getVencimiento().isAfter(LocalDateTime.now().plusMinutes(29)));
+        assertTrue(registro.getVencimiento().isBefore(LocalDateTime.now().plusMinutes(31)));
+    }
+
+    @Test
+    void despuesDeRestablecerElTokenQuedaUsado() throws UsuarioException {
+        crearAna();
+        String token = pedirToken();
+        sistema.restablecerPassword(token, "nueva456");
+        assertTrue(tokens.findAll().get(0).isUsado());
+    }
 }

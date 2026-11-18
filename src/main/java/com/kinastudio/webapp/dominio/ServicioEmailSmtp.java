@@ -30,7 +30,7 @@ public class ServicioEmailSmtp implements ServicioEmail {
             @Value("${spring.mail.username:}") String usuarioSmtp) {
         this.mailSender = mailSender;
         this.remitente = remitente;
-        this.urlFront = urlFront.replaceAll("/+$", "");
+        this.urlFront = quitarBarrasFinales(urlFront);
         this.usuarioSmtp = usuarioSmtp;
     }
 
@@ -61,5 +61,13 @@ public class ServicioEmailSmtp implements ServicioEmail {
         } catch (MailException e) {
             LOG.error("No se pudo enviar el mail de recuperación a {}: {}", destinatario, e.getMessage());
         }
+    }
+
+    private static String quitarBarrasFinales(String url) {
+        String limpia = url;
+        while (limpia.endsWith("/")) {
+            limpia = limpia.substring(0, limpia.length() - 1);
+        }
+        return limpia;
     }
 }
