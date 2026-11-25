@@ -1,10 +1,12 @@
 package com.kinastudio.webapp.dominio;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import org.springframework.stereotype.Component;
 
 import com.kinastudio.webapp.dominio.excepciones.ClienteException;
+import com.kinastudio.webapp.dominio.excepciones.MaterialException;
 import com.kinastudio.webapp.dominio.excepciones.UsuarioException;
 
 @Component
@@ -67,5 +69,21 @@ public class Fachada {
 
     public void eliminarCliente(Long id) throws ClienteException {
         sistemaStudio.eliminarCliente(id);
+    }
+
+    public Material crearMaterial(String nombre, int stock, BigDecimal precioUnitario, String marca, Categoria categoria, int umbralMinimo) throws MaterialException {
+        return sistemaStudio.crearMaterial(nombre, stock, precioUnitario, marca, categoria, umbralMinimo);
+    }
+
+    public Material modificarMaterial(long id,String nombre, int stock, BigDecimal precioUnitario, String marca, Categoria categoria, int umbralMinimo) throws MaterialException {
+        return sistemaStudio.modificarMaterial(id, nombre, stock, precioUnitario, marca, categoria, umbralMinimo);
+    }
+
+    public void eliminarMaterial(Long id) throws MaterialException {
+        sistemaStudio.eliminarMaterial(id);
+    }
+
+    public List<Material> listarMateriales() throws MaterialException {
+        return sistemaStudio.listarMateriales();
     }
 }
