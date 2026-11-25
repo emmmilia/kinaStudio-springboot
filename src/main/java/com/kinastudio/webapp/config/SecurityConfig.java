@@ -30,6 +30,7 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/error", "/acceso/csrf", "/acceso/recuperarPassword", "/acceso/restablecerPassword").permitAll()
                 .requestMatchers("/acceso/registroEsteticista").hasRole("ADMINISTRADOR")
+                .requestMatchers("/clientes/**").hasRole("ADMINISTRADOR")
                 .anyRequest().authenticated())
             .formLogin(form -> form
                 .loginProcessingUrl("/acceso/login")
