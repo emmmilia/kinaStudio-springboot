@@ -41,7 +41,7 @@ public class Fachada {
         return sistemaAcceso.crearUsuario(email, nombreUsuario, password, nombreCompleto, TipoUsuario.ADMINISTRADOR);
     }
     
-    public void cambiarPassword(String nombreUsuario, String nuevaPassword, String passwordActual) throws UsuarioException{
+    public void cambiarPassword(String nombreUsuario, String passwordActual, String nuevaPassword) throws UsuarioException{
         sistemaAcceso.cambiarPassword(nombreUsuario, passwordActual, nuevaPassword);
     }
 
@@ -61,8 +61,8 @@ public class Fachada {
         return sistemaStudio.listarClientes();
     }
 
-    public Cliente modificarCliente(Long id, Cliente datos) throws ClienteException {
-        return sistemaStudio.modificarCliente(id, datos);
+    public Cliente modificarCliente(Long id, String nombreCompleto, String email, String telefono, String notas) throws ClienteException {
+        return sistemaStudio.modificarCliente(id, nombreCompleto, email, telefono, notas);
     }
 
     public void eliminarCliente(Long id) throws ClienteException {

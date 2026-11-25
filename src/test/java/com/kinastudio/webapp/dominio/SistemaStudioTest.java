@@ -63,9 +63,8 @@ class SistemaStudioTest {
     @Test
     void modificarGuardaLosDatosNuevos() throws ClienteException {
         Cliente c = sistema.crearCliente("Ana Pérez", "ana@mail.com", "099123456", null);
-        Cliente datos = new Cliente("Ana Gómez", "nuevo@mail.com", "098000000", "vip");
 
-        Cliente modificado = sistema.modificarCliente(c.getId(), datos);
+        Cliente modificado = sistema.modificarCliente(c.getId(), "Ana Gómez", "nuevo@mail.com", "098000000", "vip");
 
         assertEquals("Ana Gómez", modificado.getNombreCompleto());
         assertEquals("nuevo@mail.com", modificado.getEmail());
@@ -75,9 +74,8 @@ class SistemaStudioTest {
 
     @Test
     void modificarFallaSiNoExiste() {
-        Cliente datos = new Cliente("Ana", "a@mail.com", "099", null);
         ClienteException ex = assertThrows(ClienteException.class, () ->
-            sistema.modificarCliente(9999L, datos));
+            sistema.modificarCliente(9999L, "Ana", "a@mail.com", "099", null));
         assertEquals("Cliente no encontrado", ex.getMessage());
     }
 

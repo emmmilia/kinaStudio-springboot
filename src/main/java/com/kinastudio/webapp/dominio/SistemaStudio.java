@@ -36,13 +36,13 @@ public class SistemaStudio {
         return texto == null || texto.isBlank();
     }
 
-    public Cliente modificarCliente(Long id, Cliente datos) throws ClienteException {
+    public Cliente modificarCliente(Long id, String nombreCompleto, String email, String telefono, String notas) throws ClienteException {
         Cliente cliente = clienteRepository.findById(id)
             .orElseThrow(() -> new ClienteException("Cliente no encontrado"));
-        cliente.setNombreCompleto(datos.getNombreCompleto());
-        cliente.setEmail(datos.getEmail());
-        cliente.setTelefono(datos.getTelefono());
-        cliente.setNotas(datos.getNotas());
+        cliente.setNombreCompleto(nombreCompleto);
+        cliente.setEmail(email);
+        cliente.setTelefono(telefono);
+        cliente.setNotas(notas);
         return clienteRepository.save(cliente);
     }
 

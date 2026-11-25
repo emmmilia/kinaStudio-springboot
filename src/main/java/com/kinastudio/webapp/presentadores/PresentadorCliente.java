@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -39,8 +38,9 @@ public class PresentadorCliente {
     }
 
     @PutMapping("/{id}")
-    public Cliente modificarCliente(@PathVariable Long id, @RequestBody Cliente datos) throws ClienteException {
-        return fachada.modificarCliente(id, datos);
+    public ClienteDto modificarCliente(@PathVariable Long id, @RequestParam String nombreCompleto, @RequestParam(required = false) String email, @RequestParam String telefono, @RequestParam(required = false) String notas) throws ClienteException {
+        Cliente modificado = fachada.modificarCliente(id, nombreCompleto, email, telefono, notas);
+        return new ClienteDto(modificado);
     }
 
     @DeleteMapping("/{id}")
