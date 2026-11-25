@@ -1,8 +1,10 @@
 package com.kinastudio.webapp.dominio;
 
-import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.RequestParam;
+import java.util.List;
 
+import org.springframework.stereotype.Component;
+
+import com.kinastudio.webapp.dominio.excepciones.ClienteException;
 import com.kinastudio.webapp.dominio.excepciones.UsuarioException;
 
 @Component
@@ -49,5 +51,21 @@ public class Fachada {
 
     public void restablecerPassword(String token, String password) throws UsuarioException{
         sistemaAcceso.restablecerPassword(token, password);
+    }
+
+    public Cliente crearCliente(String nombreCompleto, String email, String telefono, String notas) throws ClienteException {
+        return sistemaStudio.crearCliente(nombreCompleto, email, telefono, notas);
+    }
+
+    public List<Cliente> listarClientes() throws ClienteException {
+        return sistemaStudio.listarClientes();
+    }
+
+    public Cliente modificarCliente(Long id, String nombreCompleto, String email, String telefono, String notas) throws ClienteException {
+        return sistemaStudio.modificarCliente(id, nombreCompleto, email, telefono, notas);
+    }
+
+    public void eliminarCliente(Long id) throws ClienteException {
+        sistemaStudio.eliminarCliente(id);
     }
 }
