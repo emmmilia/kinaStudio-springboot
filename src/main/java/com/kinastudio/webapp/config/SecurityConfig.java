@@ -12,11 +12,17 @@ import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 
 /**
  * Seguridad de la API: un único login con usuario y contraseña (sesión con cookie).
- *
- * - POST /acceso/login   inicia sesión (campos: nombreUsuario y password)
- * - POST /acceso/logout  cierra sesión
- * - GET  /acceso/csrf    entrega el token CSRF que el front envía en las peticiones que modifican datos
- * - GET  /acceso/yo      devuelve el usuario con sesión iniciada
+ * 
+ * - POST /acceso/login inicia sesión (campos: nombreUsuario y password)
+ * - POST /acceso/logout cierra sesión
+ * - GET /acceso/csrf entrega el token CSRF que el front envía en las peticiones que modifican datos
+ * - GET /acceso/yo devuelve el usuario con sesión iniciada
+ * 
+ * Permisos:
+ * - Sin sesión solo se puede usar el login, el token CSRF y la recuperación de contraseña.
+ * - Solo el administrador puede registrar esteticistas, gestionar clientes (/clientes/**)
+ *   y gestionar materiales (/studio/**).
+ * - El resto de los endpoints pide sesión iniciada, con cualquier rol.
  *
  * La protección CSRF está activa (es el comportamiento por defecto de Spring Security).
  */
@@ -30,7 +36,8 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/error", "/acceso/csrf", "/acceso/recuperarPassword", "/acceso/restablecerPassword").permitAll()
                 .requestMatchers("/acceso/registroEsteticista").hasRole("ADMINISTRADOR")
-                .requestMatchers("/clientes/**").hasRole("ADMINISTRADOR")
+                .requestMatchers("/clientes", "/clientes/**").hasRole("ADMINISTRADOR")
+                .requestMatchers("/studio", "/studio/**").hasRole("ADMINISTRADOR")
                 .anyRequest().authenticated())
             .formLogin(form -> form
                 .loginProcessingUrl("/acceso/login")

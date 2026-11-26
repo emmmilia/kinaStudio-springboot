@@ -19,4 +19,6 @@ public interface MaterialRepository extends JpaRepository<Material, Long> {
     boolean existsByMarcaIgnoreCase(String marca);
 
     boolean existsByNombreIgnoreCaseAndMarcaIgnoreCase(String nombre, String marca);
+
+    boolean existsByNombreIgnoreCaseAndMarcaIgnoreCaseAndIdNot(String nombre, String marca, Long id);
 }
