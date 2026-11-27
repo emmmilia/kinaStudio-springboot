@@ -4,6 +4,7 @@ import com.kinastudio.webapp.dominio.TipoUsuario;
 import com.kinastudio.webapp.dominio.Usuario;
 
 public class UsuarioDto {
+    private long id;
     private String email;
     private String nombreUsuario;
     private String nombreCompleto;
@@ -14,11 +15,16 @@ public class UsuarioDto {
     }
 
     public UsuarioDto(Usuario usuario){
+        this.id = usuario.getId();
         this.email = usuario.getEmail();
         this.nombreUsuario = usuario.getNombreUsuario();
         this.nombreCompleto = usuario.getNombreCompleto();
         this.rol = usuario.getRol();
         this.comentario = usuario.getComentario();
+    }
+
+    public long getId() {
+        return id;
     }
 
     public String getEmail() {

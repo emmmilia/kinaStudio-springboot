@@ -1,26 +1,27 @@
 package com.kinastudio.webapp.dtos;
 
-import java.util.ArrayList;
+import java.math.BigDecimal;
 import java.util.List;
 
-import com.kinastudio.webapp.dominio.Material;
 import com.kinastudio.webapp.dominio.Servicio;
-import com.kinastudio.webapp.dominio.Usuario;
 
-public class ServicioDto {
-    private String nombre;
-    private int tiempoEstimado;
-    private ArrayList<Material> materiales;
-    private String precioBase;
-    private List<Usuario> esteticistasHabilitadas;
+public record ServicioDto(
+        long id,
+        String nombre,
+        int tiempoEstimado,
+        BigDecimal precioBase,
+        List<UsuarioDto> esteticistasHabilitadas,
+        List<MaterialDto> materiales) {
 
     public ServicioDto(Servicio servicio) {
-        this.nombre = servicio.getNombre();
-        this.tiempoEstimado = servicio.getTiempoEstimado();
-        this.materiales = new ArrayList<>(servicio.getMateriales());
-        this.precioBase = servicio.getPrecioBase().toString();
-        this.esteticistasHabilitadas = new ArrayList<>(servicio.getEsteticistasHabilitadas());
+        this(servicio.getId(),
+                servicio.getNombre(),
+                servicio.getTiempoEstimado(),
+                servicio.getPrecioBase(),
+                servicio.getEsteticistasHabilitadas().stream().map(UsuarioDto::new).toList(),
+                servicio.getMateriales().stream().map(MaterialDto::new).toList());
     }
+
 
     public String getNombre() {
         return nombre;
@@ -30,4 +31,5 @@ public class ServicioDto {
         return tiempoEstimado;
     }
 
-}
+
+    }

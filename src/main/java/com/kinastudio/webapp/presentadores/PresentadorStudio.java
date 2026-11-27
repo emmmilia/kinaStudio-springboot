@@ -40,12 +40,12 @@ public class PresentadorStudio {
 
     //materiales
 
-    @PostMapping("/vistaConectada")
+    @GetMapping("/vistaConectada")
     public Commands vistaConectada() throws MaterialException, UsuarioException {
         return Commands.create(Materiales(), Esteticistas());
     }
     
-    @GetMapping
+    @GetMapping("/materiales")
     public Commands listarMateriales() throws MaterialException {
         return Commands.create(new Command("listarMateriales", fachada.listarMateriales().stream().map(MaterialDto::new).collect(java.util.stream.Collectors.toList())));
     }
