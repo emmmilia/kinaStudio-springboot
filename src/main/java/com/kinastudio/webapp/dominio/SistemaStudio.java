@@ -7,18 +7,22 @@ import org.springframework.stereotype.Service;
 
 import com.kinastudio.webapp.dominio.excepciones.ClienteException;
 import com.kinastudio.webapp.dominio.excepciones.MaterialException;
+import com.kinastudio.webapp.dominio.excepciones.ServicioException;
 import com.kinastudio.webapp.dominio.repositorios.ClienteRepository;
 import com.kinastudio.webapp.dominio.repositorios.MaterialRepository;
+import com.kinastudio.webapp.dominio.repositorios.ServicioRepository;
 
 @Service
 public class SistemaStudio {
 
     private final ClienteRepository clienteRepository;
     private final MaterialRepository materialRepository;
+    private final ServicioRepository servicioRepository;
 
-    public SistemaStudio(ClienteRepository clienteRepository, MaterialRepository materialRepository) {
+    public SistemaStudio(ClienteRepository clienteRepository, MaterialRepository materialRepository, ServicioRepository servicioRepository) {
         this.clienteRepository = clienteRepository;
         this.materialRepository = materialRepository;
+        this.servicioRepository = servicioRepository;
     }
 
     public Cliente crearCliente(String nombreCompleto, String email, String telefono, String notas)
@@ -105,5 +109,50 @@ public class SistemaStudio {
             throw new MaterialException("Material no encontrado");
         }
         materialRepository.deleteById(id);
+    }
+
+    public Servicio crearServicio(String nombre, List<Usuario> esteticistasHabilitadas, int tiempoEstimado, List<Material> materiales, BigDecimal precioBase) throws ServicioException {
+        if (esVacio(nombre)) {
+            throw new ServicioException("El nombre es obligatorio.");
+        }
+        if (tiempoEstimado <= 0) {
+            throw new ServicioException("El tiempo estimado debe ser mayor a cero.");
+        }
+        if (precioBase.compareTo(BigDecimal.ZERO) < 0) {
+            throw new ServicioException("El precio base no puede ser negativo.");
+        }
+        Servicio nuevo = new Servicio(nombre.trim(), esteticistasHabilitadas, tiempoEstimado, materiales, precioBase);
+        servicioRepository.save(nuevo);
+        return nuevo;
+    }
+
+    public Servicio modificarServicio(long id, String nombre, List<Usuario> esteticistasHabilitadas, int tiempoEstimado, List<Material> materiales, BigDecimal precioBase) throws ServicioException {
+        Servicio servicio = servicioRepository.findById(id).orElseThrow(() -> new ServicioException("Servicio no encontrado"));
+        if (esVacio(nombre)) {
+            throw new ServicioException("El nombre es obligatorio.");
+        }
+        if(tiempoEstimado <= 0) {
+            throw new ServicioException("El tiempo estimado debe ser mayor a cero.");
+        }
+        if(precioBase.compareTo(BigDecimal.ZERO) < 0) {
+            throw new ServicioException("El precio base no puede ser negativo.");
+        }
+        servicio.setNombre(nombre);
+        servicio.setEsteticistasHabilitadas(esteticistasHabilitadas);
+        servicio.setTiempoEstimado(tiempoEstimado);
+        servicio.setMateriales(materiales);
+        servicio.setPrecioBase(precioBase);
+        return servicioRepository.save(servicio);
+    }
+
+    public void eliminarServicio(long id) throws ServicioException {
+        if (!servicioRepository.existsById(id)) {
+            throw new ServicioException("Servicio no encontrado");
+        }
+        servicioRepository.deleteById(id);
+    }
+
+    public List<Servicio> listarServicios() throws ServicioException {
+        return servicioRepository.findAll();
     }
 }

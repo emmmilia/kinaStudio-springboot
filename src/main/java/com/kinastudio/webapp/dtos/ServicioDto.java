@@ -1,32 +1,25 @@
 package com.kinastudio.webapp.dtos;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import com.kinastudio.webapp.dominio.Material;
+import com.kinastudio.webapp.dominio.Servicio;
+import com.kinastudio.webapp.dominio.Usuario;
 
 public class ServicioDto {
-    private long id;
     private String nombre;
     private int tiempoEstimado;
-    private String comision;
     private ArrayList<Material> materiales;
     private String precioBase;
-    private String esteticistasHabilitadas;
-    private String comentario;
+    private List<Usuario> esteticistasHabilitadas;
 
-    public ServicioDto(long id, String nombre, int tiempoEstimado, String comision, ArrayList<Material> materiales, String precioBase, String esteticistasHabilitadas, String comentario) {
-        this.id = id;
-        this.nombre = nombre;
-        this.tiempoEstimado = tiempoEstimado;
-        this.comision = comision;
-        this.materiales = materiales;
-        this.precioBase = precioBase;
-        this.esteticistasHabilitadas = esteticistasHabilitadas;
-        this.comentario = comentario;
-    }
-
-    public long getId() {
-        return id;
+    public ServicioDto(Servicio servicio) {
+        this.nombre = servicio.getNombre();
+        this.tiempoEstimado = servicio.getTiempoEstimado();
+        this.materiales = new ArrayList<>(servicio.getMateriales());
+        this.precioBase = servicio.getPrecioBase().toString();
+        this.esteticistasHabilitadas = new ArrayList<>(servicio.getEsteticistasHabilitadas());
     }
 
     public String getNombre() {
@@ -37,8 +30,4 @@ public class ServicioDto {
         return tiempoEstimado;
     }
 
-    public String getComision() {
-        return comision;
-    }
-    
 }

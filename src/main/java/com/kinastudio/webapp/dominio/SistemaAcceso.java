@@ -5,8 +5,10 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.HexFormat;
+import java.util.List;
 
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -60,14 +62,12 @@ public class SistemaAcceso {
             throw new UsuarioException("El rol es obligatorio.");
         }
         validarLargos(email, nombreUsuario, password, nombreCompleto);
-
         if (usuarioRepository.existsByNombreUsuarioIgnoreCase(nombreUsuario)) {
             throw new UsuarioException("Ese nombre de usuario no está disponible.");
         }
         if (usuarioRepository.existsByEmailIgnoreCase(email)) {
             throw new UsuarioException("Ese mail ya está registrado.");
         }
-
         Usuario nuevo = new Usuario(email, nombreUsuario, passwordEncoder.encode(password), nombreCompleto, rol);
         try {
             return usuarioRepository.save(nuevo);
@@ -75,6 +75,10 @@ public class SistemaAcceso {
             // Dos altas simultáneas con el mismo dato: la base lo frena con sus restricciones únicas
             throw new UsuarioException("Ese mail o nombre de usuario ya está registrado.");
         }
+    }
+
+    public List<Usuario> listarEsteticistas() throws UsuarioException {
+        return usuarioRepository.findAll();
     }
 
     public Usuario modificarUsuario(String nombreUsuario, String email, String nombreCompleto, String comentario) throws UsuarioException{

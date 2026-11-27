@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 
 import com.kinastudio.webapp.dominio.excepciones.ClienteException;
 import com.kinastudio.webapp.dominio.excepciones.MaterialException;
+import com.kinastudio.webapp.dominio.excepciones.ServicioException;
 import com.kinastudio.webapp.dominio.excepciones.UsuarioException;
 
 @Component
@@ -23,6 +24,10 @@ public class Fachada {
         this.sistemaAcceso = sistemaAcceso;
         this.sistemaAgenda = sistemaAgenda;
         this.sistemaPago = sistemaPago;
+    }
+
+    public List<Usuario> listarEsteticistas() throws UsuarioException {
+        return sistemaAcceso.listarEsteticistas();
     }
 
     public Usuario modificarUsuario(String nombreUsuario, String email, String nombreCompleto, String comentario) throws UsuarioException{
@@ -85,5 +90,21 @@ public class Fachada {
 
     public List<Material> listarMateriales() throws MaterialException {
         return sistemaStudio.listarMateriales();
+    }
+
+    public Servicio crearServicio(String nombre, List<Usuario> esteticistasHabilitadas, int tiempoEstimado, List<Material> materiales, BigDecimal precioBase) throws ServicioException {
+        return sistemaStudio.crearServicio(nombre, esteticistasHabilitadas, tiempoEstimado, materiales, precioBase);
+    }
+
+    public Servicio modificarServicio(long id, String nombre, List<Usuario> esteticistasHabilitadas, int tiempoEstimado, List<Material> materiales, BigDecimal precioBase) throws ServicioException {
+        return sistemaStudio.modificarServicio(id, nombre, esteticistasHabilitadas, tiempoEstimado, materiales, precioBase);
+    }
+
+    public void eliminarServicio(long id) throws ServicioException {
+        sistemaStudio.eliminarServicio(id);
+    }
+
+    public List<Servicio> listarServicios() throws ServicioException {
+        return sistemaStudio.listarServicios();
     }
 }

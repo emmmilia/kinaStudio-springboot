@@ -1,35 +1,52 @@
 package com.kinastudio.webapp.dominio;
 
 import java.util.ArrayList;
+import java.util.List;
 
-// import jakarta.persistence.Column;
-// import jakarta.persistence.Entity;
-// import jakarta.persistence.GeneratedValue;
-// import jakarta.persistence.Id;
-// import jakarta.persistence.Table;
-// import jakarta.persistence.GenerationType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.Table;
+import jakarta.persistence.GenerationType;
 
 import java.math.BigDecimal;
 
+@Entity
+@Table(name = "servicio")
 public class Servicio {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
+
+    @Column(name = "nombre", nullable = false)
     private String nombre;
-    private ArrayList<Usuario> esteticistasHabilitadas;
+
+    @ManyToMany
+    @JoinTable(name = "servicio_esteticista", joinColumns = @JoinColumn(name = "servicio_id"), inverseJoinColumns = @JoinColumn(name = "esteticista_id"))
+    private List<Usuario> esteticistasHabilitadas = new ArrayList<>();
+
+    @Column(name = "tiempo_estimado", nullable = false)
     private int tiempoEstimado;
-    private Comision comision;
-    private ArrayList<Material> materiales;
+
+    @ManyToMany
+    @JoinTable(name = "servicio_material", joinColumns = @JoinColumn(name = "servicio_id"), inverseJoinColumns = @JoinColumn(name = "material_id"))
+    private List<Material> materiales = new ArrayList<>();
+
+    @Column(name = "precio_base", nullable = false, precision = 10, scale = 2)
     private BigDecimal precioBase;
 
     protected Servicio() {
     }
 
-    public Servicio(long id, String nombre, ArrayList<Usuario> esteticistasHabilitadas, int tiempoEstimado, Comision comision, ArrayList<Material> materiales, BigDecimal precioBase) {
-        this.id = id;
+    public Servicio(String nombre, List<Usuario> esteticistasHabilitadas, int tiempoEstimado, List<Material> materiales, BigDecimal precioBase) {
         this.nombre = nombre;
         this.esteticistasHabilitadas = esteticistasHabilitadas;
         this.tiempoEstimado = tiempoEstimado;
-        this.comision = comision;
         this.materiales = materiales;
         this.precioBase = precioBase;
     }
@@ -42,7 +59,7 @@ public class Servicio {
         return nombre;
     }
 
-    public ArrayList<Usuario> getEsteticistasHabilitadas() {
+    public List<Usuario> getEsteticistasHabilitadas() {
         return esteticistasHabilitadas;
     }
 
@@ -50,15 +67,11 @@ public class Servicio {
         return tiempoEstimado;
     }
 
-    public Comision getComision() {
-        return comision;
-    }
-
     public BigDecimal getPrecioBase() {
         return precioBase;
     }
 
-    public ArrayList<Material> getMateriales() {
+    public List<Material> getMateriales() {
         return materiales;
     }
 
@@ -66,7 +79,7 @@ public class Servicio {
         this.nombre = nombre;
     }
 
-    public void setEsteticistasHabilitadas(ArrayList<Usuario> esteticistasHabilitadas) {
+    public void setEsteticistasHabilitadas(List<Usuario> esteticistasHabilitadas) {
         this.esteticistasHabilitadas = esteticistasHabilitadas;
     }
 
@@ -74,11 +87,7 @@ public class Servicio {
         this.tiempoEstimado = tiempoEstimado;
     }
 
-    public void setComision(Comision comision) {
-        this.comision = comision;
-    }
-
-    public void setMateriales(ArrayList<Material> materiales) {
+    public void setMateriales(List<Material> materiales) {
         this.materiales = materiales;
     }
 

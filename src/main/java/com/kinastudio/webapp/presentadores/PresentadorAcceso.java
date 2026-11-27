@@ -78,7 +78,8 @@ public class PresentadorAcceso {
         fachada.restablecerPassword(token, passwordNueva);
         return Commands.create(mensaje("Contraseña restablecida con éxito."));
     }
-     @PostMapping("/registroEsteticista")
+    
+    @PostMapping("/registroEsteticista")
     public Commands registrarEsteticista(@RequestParam String email, @RequestParam String nombreUsuario, @RequestParam String password, @RequestParam String nombreCompleto) 
      throws UsuarioException {
         Usuario usuarioNuevo = fachada.registrarEsteticista(email, nombreUsuario, password, nombreCompleto);
