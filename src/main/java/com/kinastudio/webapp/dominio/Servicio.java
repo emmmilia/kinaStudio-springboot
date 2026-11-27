@@ -45,9 +45,9 @@ public class Servicio {
 
     public Servicio(String nombre, List<Usuario> esteticistasHabilitadas, int tiempoEstimado, List<Material> materiales, BigDecimal precioBase) {
         this.nombre = nombre;
-        this.esteticistasHabilitadas = esteticistasHabilitadas;
+        this.esteticistasHabilitadas = new ArrayList<>(esteticistasHabilitadas);
         this.tiempoEstimado = tiempoEstimado;
-        this.materiales = materiales;
+        this.materiales = new ArrayList<>(materiales);
         this.precioBase = precioBase;
     }
 
@@ -79,19 +79,19 @@ public class Servicio {
         this.nombre = nombre;
     }
 
-    public void setEsteticistasHabilitadas(List<Usuario> esteticistasHabilitadas) {
-        this.esteticistasHabilitadas = esteticistasHabilitadas;
-    }
-
     public void setTiempoEstimado(int tiempoEstimado) {
         this.tiempoEstimado = tiempoEstimado;
-    }
-
-    public void setMateriales(List<Material> materiales) {
-        this.materiales = materiales;
     }
 
     public void setPrecioBase(BigDecimal precioBase) {
         this.precioBase = precioBase;
     }
+
+    public void setEsteticistasHabilitadas(List<Usuario> esteticistasHabilitadas) {
+    this.esteticistasHabilitadas = new ArrayList<>(esteticistasHabilitadas);
+}
+
+    public void setMateriales(List<Material> materiales) {
+        this.materiales = new ArrayList<>(materiales);
+}
 }

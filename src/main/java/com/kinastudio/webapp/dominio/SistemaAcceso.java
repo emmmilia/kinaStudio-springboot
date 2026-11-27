@@ -52,7 +52,7 @@ public class SistemaAcceso {
         if (esVacio(nombreUsuario) || esVacio(password)) {
             throw new UsuarioException("Usuario y contraseña son obligatorios.");
         }
-        if (!esMailValido(email)) {
+        if (!ValidadorEmail.esValido(email)) {
             throw new UsuarioException("El mail no es válido.");
         }
         if (esVacio(nombreCompleto)) {
@@ -86,7 +86,7 @@ public class SistemaAcceso {
         if (usuario == null) {
             throw new UsuarioException("Usuario no encontrado.");
         }
-        if(!esMailValido(email)){
+        if(!ValidadorEmail.esValido(email)){
             throw new UsuarioException("El mail no es válido.");
         }
         if(esVacio(nombreCompleto)){
@@ -149,7 +149,6 @@ public class SistemaAcceso {
         if (usuario == null) {
             return;
         }
-        // Solo vale el último enlace pedido
         invalidarTokensPendientes(usuario);
 
         String token = generarToken();
@@ -221,22 +220,8 @@ public class SistemaAcceso {
         }
     }
 
-
     private boolean esVacio(String texto) {
         return texto == null || texto.isBlank();
     }
 
-
-    private boolean esMailValido(String email) {
-        if (esVacio(email) || email.chars().anyMatch(Character::isWhitespace)) {
-            return false;
-        }
-        int arroba = email.indexOf('@');
-        if (arroba <= 0 || arroba != email.lastIndexOf('@')) {
-            return false;
-        }
-        String dominio = email.substring(arroba + 1);
-        int punto = dominio.indexOf('.');
-        return punto > 0 && !dominio.endsWith(".") && !dominio.contains("..");
-    }
 }

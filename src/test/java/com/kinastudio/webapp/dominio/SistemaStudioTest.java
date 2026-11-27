@@ -44,6 +44,15 @@ class SistemaStudioTest {
         assertEquals("El teléfono es obligatorio.", ex.getMessage());
     }
 
+    @Test
+    void rechazaEmailInvalido() {
+        for (String invalido : new String[] { "no-es-un-mail", "ana@", "@mail.com", "ana@mail", "ana@@mail.com" }) {
+            ClienteException ex = assertThrows(ClienteException.class, () ->
+                sistema.crearCliente("Ana Pérez", invalido, "099123456", null));
+            assertEquals("El email no es válido.", ex.getMessage());
+        }
+    }
+
         // ---------- Listar ----------
 
     @Test

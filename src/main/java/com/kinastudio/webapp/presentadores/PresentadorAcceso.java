@@ -5,7 +5,6 @@ import java.util.Map;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.web.csrf.CsrfToken;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,8 +16,6 @@ import com.kinastudio.webapp.dominio.Usuario;
 import com.kinastudio.webapp.dominio.excepciones.UsuarioException;
 import com.kinastudio.webapp.dtos.UsuarioDto;
 
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * Endpoints de apoyo al login. No tocan el dominio: la sesión la maneja Spring Security.
